@@ -1,16 +1,25 @@
 var audio_context;
 var recorder;
 
+// test recording of oscillator
+var ac = new AudioContext();
+var osc = ac.createOscillator();
+var dest = ac.createMediaStreamDestination();
+
 function startUserMedia(stream) {
   var input = audio_context.createMediaStreamSource(stream);
-  recorder = new Recorder(input);
+  recorder = new Recorder(dest.stream);
+  osc.connect(dest);
 }
 
 function startRecording() {
+  // osc.start(0);
   recorder && recorder.record();
+
 }
 
 function stopRecording() {
+  // osc.stop(0);
   recorder && recorder.stop();
   createDownloadLink();
   recorder.clear();
@@ -24,7 +33,7 @@ function createDownloadLink() {
     var au = document.createElement('audio');
     var br = document.createElement('br');
     var hf = document.createElement('a');
-    
+
     au.controls = true;
     au.src = url;
     hf.href = url;
@@ -43,11 +52,12 @@ window.onload = function init() {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
       navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
       window.URL = window.URL || window.webkitURL;
-      
+
       audio_context = new AudioContext;
     } catch (e) {
       alert('No web audio support in this browser!');
     }
-    navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
-    });
+    // navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+    // });
+    recorder = new Recorder(Tone.Master.output);
   };
